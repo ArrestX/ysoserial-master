@@ -22,9 +22,16 @@ public class javaAssistTest {
         CtConstructor ctConstructor = new CtConstructor(new CtClass[]{},ctClass);
         ctConstructor.setBody("{System.out.print(2);}");
         ctClass.addConstructor(ctConstructor);
+
+        //todo 这里有bug 修改不成功
+
+
+        CtClass c2 = classPool.get("ysoserial.aaa");
+        CtConstructor ctConstructor2 = c2.getConstructors()[0];
+        ctConstructor2.insertBefore("System.out.print(567);");
 //        ctClass.debugWriteFile("D:\\");
 //接着写入某个class里
-        new FileOutputStream("3.class").write(ctClass.toBytecode());
+        new FileOutputStream("2.class").write(c2.toBytecode());
         ctClass.toBytecode();
         //然后再一步步反射，defineclassloader去调用
         ctClass.toClass().newInstance();
