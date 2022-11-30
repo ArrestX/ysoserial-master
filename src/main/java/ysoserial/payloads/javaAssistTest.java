@@ -3,6 +3,8 @@ package ysoserial.payloads;
 import javassist.*;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
 import ysoserial.payloads.util.Gadgets;
 
 import java.io.FileOutputStream;
@@ -64,7 +66,7 @@ public class javaAssistTest {
                 public void edit(MethodCall m)
                     throws CannotCompileException
                 {
-                    System.out.println(m.getMethodName());
+                    System.out.println(m.getClassName()+"\t"+m.getMethodName());
                 }
             });
         //这里一般放到最后，写道哪个类里边
@@ -80,7 +82,10 @@ class aaa{
         System.out.print(222);
     }
     public void print(String x){
-        x.split(".");
-        System.out.println(x);
+        ConstantTransformer c = new ConstantTransformer(Runtime.class);
+        System.out.println(this.name);
+//        InvokerTransformer invokerTransformer = new InvokerTransformer();
+//        x.split(".");
+//        System.out.println(x);
     }
 }
