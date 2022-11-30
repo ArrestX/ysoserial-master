@@ -92,7 +92,23 @@ public class javaAssistTest {
                 }
             });
         Method m  = aaa.class.getMethod("print", String.class);
+        m.setAccessible(true);
         m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
+//        m.invoke(new aaa(),"aa");
         //这里一般放到最后，写道哪个类里边
         new FileOutputStream("2.class").write(c2.toBytecode());
 
