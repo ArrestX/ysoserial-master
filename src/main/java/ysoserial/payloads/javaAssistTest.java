@@ -2,6 +2,7 @@ package ysoserial.payloads;
 
 import javassist.*;
 import javassist.expr.ExprEditor;
+import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
 import org.apache.commons.collections.functors.ConstantTransformer;
 import org.apache.commons.collections.functors.InvokerTransformer;
@@ -61,12 +62,28 @@ public class javaAssistTest {
         CtClass c2 = classPool.get("ysoserial.payloads.aaa");
         CtMethod method1 = c2.getDeclaredMethod("print",new CtClass[]{classPool.get("java.lang.String")});
         method1.insertAfter("System.out.print($1);");
+
+        //方法的替换查询或者修改
+//        method1.instrument(
+//            new ExprEditor() {
+//                public void edit(MethodCall m)
+//                    throws CannotCompileException
+//                {
+//                    System.out.println(m.getClassName()+"\t"+m.getMethodName());
+//                }
+//            });
+
+
+        //这里一般放到最后，写道哪个类里边
+//        new FileOutputStream("2.class").write(c2.toBytecode());
+
+        //属性的调用
         method1.instrument(
             new ExprEditor() {
-                public void edit(MethodCall m)
+                public void edit(FieldAccess f)
                     throws CannotCompileException
                 {
-                    System.out.println(m.getClassName()+"\t"+m.getMethodName());
+                    System.out.println(f.getFieldName());
                 }
             });
         //这里一般放到最后，写道哪个类里边
