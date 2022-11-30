@@ -10,9 +10,11 @@ import ysoserial.payloads.util.Gadgets;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class javaAssistTest {
-    public static void main(String[] args) throws NotFoundException, CannotCompileException, IOException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) throws NotFoundException, CannotCompileException, IOException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         ClassPool classPool = ClassPool.getDefault();
         //获取系统的类，已经加载完的
         CtClass ctClass = classPool.makeClass("test.test");
@@ -78,14 +80,19 @@ public class javaAssistTest {
 //        new FileOutputStream("2.class").write(c2.toBytecode());
 
         //属性的调用
-        method1.instrument(
+        c2.instrument(
             new ExprEditor() {
                 public void edit(FieldAccess f)
                     throws CannotCompileException
                 {
-                    System.out.println(f.getFieldName());
+                    System.out.println(f.getFieldName()+"\t"+f.getLineNumber());
+                    if (f.getLineNumber()==99){
+                        f.replace("$_=\"123\";");
+                    }
                 }
             });
+        Method m  = aaa.class.getMethod("print", String.class);
+        m.invoke(new aaa(),"aa");
         //这里一般放到最后，写道哪个类里边
         new FileOutputStream("2.class").write(c2.toBytecode());
 
@@ -93,11 +100,7 @@ public class javaAssistTest {
     }
 }
 class aaa{
-    public static String name = "aaa";
-    public aaa(String b,int c) {
-        this.name = b;
-        System.out.print(222);
-    }
+    public String name = "download";
     public void print(String x){
         ConstantTransformer c = new ConstantTransformer(Runtime.class);
         System.out.println(this.name);
