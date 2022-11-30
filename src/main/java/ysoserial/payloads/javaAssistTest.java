@@ -1,6 +1,8 @@
 package ysoserial.payloads;
 
 import javassist.*;
+import javassist.expr.ExprEditor;
+import javassist.expr.MethodCall;
 import ysoserial.payloads.util.Gadgets;
 
 import java.io.FileOutputStream;
@@ -46,7 +48,27 @@ public class javaAssistTest {
         CtConstructor ct2 = new CtConstructor(new CtClass[]{classPool.get("java.lang.String"),classPool.get("java.lang.String")},ctClass);
         ct2.setBody("{$0.name=$1;}");
         ctClass.addConstructor(ct2);
-        new FileOutputStream("2.class").write(ctClass.toBytecode());
+
+        // 创建一个名为printName方法，无参数，无返回值，输出name值
+        CtMethod ctMethod = new CtMethod(classPool.get("java.lang.String"), "printName", new
+            CtClass[]{}, ctClass);
+        ctMethod.setModifiers(Modifier.PUBLIC);
+        ctMethod.setBody("{System.out.println(name);return\"abcde\";}");
+        ctClass.addMethod(ctMethod);
+
+        CtClass c2 = classPool.get("ysoserial.payloads.aaa");
+        CtMethod method1 = c2.getDeclaredMethod("print",new CtClass[]{classPool.get("java.lang.String")});
+        method1.insertAfter("System.out.print($1);");
+        method1.instrument(
+            new ExprEditor() {
+                public void edit(MethodCall m)
+                    throws CannotCompileException
+                {
+                    System.out.println(m.getMethodName());
+                }
+            });
+        //这里一般放到最后，写道哪个类里边
+        new FileOutputStream("2.class").write(c2.toBytecode());
 
 
     }
@@ -56,5 +78,9 @@ class aaa{
     public aaa(String b,int c) {
         this.name = b;
         System.out.print(222);
+    }
+    public void print(String x){
+        x.split(".");
+        System.out.println(x);
     }
 }
